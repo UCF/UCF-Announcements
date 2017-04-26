@@ -13,14 +13,20 @@ if ( ! defined( 'WPINC' ) ) {
 
 define( 'UCF_ANNOUNCEMENTS__PLUGIN_FILE', __FILE__ );
 define( 'UCF_ANNOUNCEMENTS__PLUGIN_PATH', plugin_dir_path( __FILE ) );
+define( 'UCF_ANNOUNCEMENTS__TEMPLATE_PATH', UCF_ANNOUNCEMENTS__PLUGIN_PATH . '/templates' );
 define( 'UCF_ANNOUNCEMENTS__PLUGIN_URL', plugins_url( basename( dirname( __FILE__ ) ) ) );
 define( 'UCF_ANNOUNCEMENTS__STATIC_URL', UCF_ANNOUNCEMENTS__PLUGIN_URL . '/static' );
 define( 'UCF_ANNOUNCEMENTS__STYLES_URL', UCF_ANNOUNCEMENTS__STATIC_URL . '/css' );
 define( 'UCF_ANNOUNCEMENTS__SCRIPT_URL', UCF_ANNOUNCEMENTS__STATIC_URL . '/js' );
 
+include_once 'includes/ucf-announcements-config.php';
+include_once 'includes/ucf-announcements-auth.php';
+include_once 'includes/ucf-announcements-common.php';
+include_once 'includes/ucf-announcements-forms.php';
+
 if ( ! function_exists( 'ucf_announcements_plugin_activate' ) ) {
 	function ucf_announcements_plugin_activate() {
-		flush_rewrite_rules( false );
+		UCF_Announcements_Common::activate();
 	}
 
 	register_activation_hook( UCF_ANNOUNCEMENTS__PLUGIN_FILE, 'ucf_announcements_plugin_activate' );
@@ -28,7 +34,7 @@ if ( ! function_exists( 'ucf_announcements_plugin_activate' ) ) {
 
 if ( ! function_exists( 'ucf_announcements_plugin_deactivate' ) ) {
 	function ucf_announcements_plugin_deactivate() {
-		flush_rewrite_rules( false );
+		UCF_Announcements_Common::activate();
 	}
 
 	register_deactivation_hook( UCF_ANNOUNCEMENTS__PLUGIN_FILE, 'ucf_announcements_plugin_deactivate' );
@@ -36,7 +42,12 @@ if ( ! function_exists( 'ucf_announcements_plugin_deactivate' ) ) {
 
 if ( ! function_exists( 'ucf_announcements_init' ) ) {
 	function ucf_announcements_init() {
+		// Settings
+		add_action( 'admin_init', array( 'UCF_Announcements_Config', 'settings_init' ) );
+		add_action( 'admin_menu', array( 'UCF_Announcements_Config', 'add_options_page' ) );
 
+		// Set page templates
+		add_filter( 'page_template', array( 'UCF_Announcements_Common', 'page_templates' ), 10, 1 );
 	}
 
 	add_action( 'plugins_loaded', 'ucf_announcements_init' );
