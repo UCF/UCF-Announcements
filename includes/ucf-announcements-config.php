@@ -28,6 +28,7 @@ if ( !class_exists( 'UCF_Announcements_Config' ) ) {
 		 **/
 		public static function delete_options() {
 			delete_option( self::$option_prefix . 'ldap_path' );
+			delete_option( self::$option_prefix . 'form' );
 		}
 
 		/**
@@ -119,6 +120,7 @@ if ( !class_exists( 'UCF_Announcements_Config' ) ) {
 		public static function settings_init() {
 			// Register settings
 			register_setting( 'ucf_announcements', self::$option_prefix . 'ldap_path' );
+			register_setting( 'ucf_announcements', self::$option_prefix . 'form' );
 
 			// Register setting sections
 			add_settings_section(
@@ -141,6 +143,23 @@ if ( !class_exists( 'UCF_Announcements_Config' ) ) {
 					'type'        => 'text'
 				)
 			);
+
+			$gforms = UCF_Announcements_Common::get_forms_as_options();
+
+			add_settings_field(
+				self::$option_prefix . 'form',
+				'Gravity Form', // Formatted field title
+				array( 'UCF_Announcements_Config', 'display_settings_field' ), // display callback
+				'ucf_announcements', // settings page slug
+				'ucf_announcements_section_general', // option section slug
+				array( // extra arguments to pass to the callback function
+					'label_for'      => self::$option_prefix . 'form',
+					'description'    => 'Choose the gravity form to use for creating announcements.',
+					'type'           => 'select',
+					'choices'        => $gforms,
+					'placeholder'    => '-- Select Form --'
+				)
+			);
 		}
 
 		/**
@@ -153,6 +172,7 @@ if ( !class_exists( 'UCF_Announcements_Config' ) ) {
 			$hidden        = $args['hidden'] ? $args['hidden'] : false;
 			$current_value = self::get_option_or_default( $option_name );
 			$markup        = '';
+			$choices       = $args['choices'] ? $args['choices'] : array();
 
 			switch ( $field_type ) {
 				case 'checkbox':
@@ -175,7 +195,23 @@ if ( !class_exists( 'UCF_Announcements_Config' ) ) {
 				<?php
 					$markup = ob_get_clean();
 					break;
-
+				case 'select':
+					ob_start();
+				?>
+					<select id="<?php echo $option_name; ?>" name="<?php echo $option_name; ?>">
+					<?php foreach( $choices as $key => $value ) : ?>
+						<?php if ( isset( $args['placeholder'] ) ) : ?>
+						<option value="" disabled<?php echo $current_value ? '' : ' selected'; ?>><?php echo $args['placeholder']; ?></option>
+						<?php endif; ?>
+						<option value="<?php echo $key; ?>"<?php echo ($key === $current_value) ? ' selected' : ''; ?>><?php echo $value; ?></option>
+					<?php endforeach; ?>
+					</select>
+					<p class="description">
+						<?php echo $description; ?>
+					</p>
+				<?php
+					$markup = ob_get_clean();
+					break;
 				case 'text':
 				default:
 					ob_start();

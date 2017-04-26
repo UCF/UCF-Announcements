@@ -56,68 +56,38 @@ if ( ! class_exists( 'UCF_Announcements_Common' ) ) {
 		}
 
 		/**
-		 * Function responsible for handling the announcement form.
+		 * Returns all the gravity forms as options.
 		 * @author Jim Barnes
 		 * @since 1.0.0
-		 * @param $postdata | The post data
-		 * @return bool|Array | Returns true if the post is
-		 * submitted successfully. Returns an array of error strings if not.
+		 * @return Array | An associative array of forms [$id => $title]
 		 **/
-		public static function submit_announcement( $postdata ) {
-			$errors = array();
-			$args = array();
+		public static function get_forms_as_options() {
+			$retval = array();
+			$forms = GFAPI::get_forms();
 
-			if ( isset( $postdata['post_title'] ) && ! empty( $postdata['post_title'] ) ) {
-				$args['post_title'] = sanitize_text_field( $postdata['post_title'] );
-			} else {
-				$errors['post_title'] = '"Announcement Title" is required.';
+			foreach( $forms as $form ) {
+				$retval[strval($form['id'])] = $form['title'];
 			}
 
-			if ( isset( $postdata['post_content'] ) && ! empty( $postdata['post_content'] ) ) {
-				$args['post_content'] = sanitize_text_field( $postdata['post_content'] );
-			} else {
-				$errors['post_content'] = '"Description" is required.';
+			return $retval;
+		}
+
+		/**
+		 * Handles changing the post type
+		 * @author Jim Barnes
+	     * @since 1.0.0
+		 * @param $post_data Array | An array of post data from the form.
+		 * @param $form Array | An array of data about the form.
+		 * @param $entry Array | An array of data about an existing entry.
+		 * @return Array | The modified form data.
+		 **/
+		public static function announcement_save( $post_data, $form, $entry ) {
+			$form_id = UCF_Announcements_Config::get_option_or_default( 'form' );
+			if ( intval( $form['id'] ) === $form_id ) {
+				$post_data['post_type'] = 'announcement';
 			}
 
-			if ( isset( $postdata['audience'] ) && ! empty( $postdata['audience'] ) ) {
-				foreach( $postdata['audience'] as $audience ) {
-					$args['tax_input'][] = array( 'taxonomy' => ' audience', 'term' => $audience );
-				}
-			} else {
-				$errors['audience'] = '"Audience" is required.';
-			}
-
-			if ( isset( $postdata['keywords'] ) && ! empty( $postdata['keywords'] ) ) {
-				// do something
-			}
-
-			if ( isset( $postdata['start_date'] ) && ! empty( $postdata['start_date'] ) ) {
-				try {
-					$start_date = new DateTime( sanitize_text_field( $postdata['start_date'] ) );
-				}
-				catch (Exception $e) {
-					$errors['start_date'] = 'Please enter a valid date. E.g. 2017-04-29';
-				}
-			} else {
-				$errors['start_date'] = '"Start Date" is required.';
-			}
-
-			if ( isset( $postdata['end_date'] ) && ! empty( $postdata['end_date'] ) ) {
-				try {
-					$start_date = new DateTime( sanitize_text_field( $postdata['end_date'] ) );
-				}
-				catch (Exception $e) {
-					$errors['end_date'] = 'Please enter a valid date. E.g. 2017-04-29';
-				}
-			} else {
-				$errors['end_date'] = '"End Date" is required.';
-			}
-
-			if ( count( $errors ) > 0 ) {
-				return $errors;
-			}
-
-			return true;
+			return $post_data;
 		}
 	}
 }

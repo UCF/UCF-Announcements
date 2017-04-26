@@ -1,11 +1,15 @@
 <?php
+$form_id = UCF_Announcements_Config::get_option_or_default( 'form' );
+
 if ( $_POST ) {
 	if ( isset( $_POST['submit-announcement'] ) ) {
 		$success = UCF_Announcements_Common::submit_announcement( $_POST );
 
 		if ( $success !== true ) {
 			get_header(); the_post();
-			echo UCF_Announcements_Forms::create_form( $success );
+			echo '<div class="container">';
+			echo RGForms::parse_shortcode( array( 'id' => $form_id ) );
+			echo '</div>';
 			get_footer();
 			return;
 		}
@@ -19,7 +23,9 @@ if ( $_POST ) {
 	get_header(); the_post();
 
 	if ( $auth ) {
-		echo UCF_Announcements_Forms::create_form();
+		echo '<div class="container">';
+		echo RGForms::parse_shortcode( array( 'id' => $form_id ) );
+		echo '</div>';
 	} else {
 		echo UCF_Announcements_Forms::login_form( true );
 	}
@@ -32,7 +38,9 @@ if ( $_POST ) {
 	get_header(); the_post();
 
 	if ( UCF_Announcements_Auth::is_authenticated() && $valid ) {
-		echo UCF_Announcements_Forms::create_form();
+		echo '<div class="container">';
+		echo RGForms::parse_shortcode( array( 'id' => $form_id ) );
+		echo '</div>';
 	} else {
 		echo UCF_Announcements_Forms::login_form();
 	}
