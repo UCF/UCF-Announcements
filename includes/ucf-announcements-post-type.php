@@ -55,25 +55,60 @@ if ( ! class_exists( 'UCF_Announcements_PostType' ) ) {
 			wp_enqueue_style('jquery-ui');
 
 			wp_nonce_field( 'ucf_announcements_nonce_save', 'ucf_announcements_nonce' );
-			$header = get_post_meta( $post->ID, 'ucf_promo_header', TRUE );
-			$copy = get_post_meta( $post->ID, 'ucf_promo_copy', TRUE );
-			$link_text = get_post_meta( $post->ID, 'ucf_promo_link_text', TRUE );
-			$link_url = get_post_meta( $post->ID, 'ucf_promo_link_url', TRUE );
+			$start_date = get_post_meta( $post->ID, 'announcement_start_date', true );
+			$end_date   = get_post_meta( $post->ID, 'announcement_end_date', true );
+			$url        = get_post_meta( $post->ID, 'announcement_url', true );
+			$contact    = get_post_meta( $post->ID, 'announcement_contact', true );
+			$phone      = get_post_meta( $post->ID, 'announcement_contact', true );
+			$email      = get_post_meta( $post->ID, 'announcement_email', true );
+			$posted_by  = get_post_meta( $post->ID, 'announcement_posted_by', true );
 ?>
 			<table class="form-table">
 				<tbody>
 					<tr>
 						<th><label class="block" for="announcement_start_date">Start Date</label></th>
 						<td>
-							<p class="description">The date the announcement should <strong>begin</strong> displaying.</p>
+							<p class="description">Date that the announcement should become active. <strong>Note that announcements with no start date or end date will not appear in any announcement feeds.</p>
 							<input type="text" id="announcement_start_date" name="announcement_start_date" class="datepicker" <?php echo ( ! empty( $start_date ) ) ? 'value="' . $start_date . '"' : ''; ?>>
 						</td>
 					</tr>
 					<tr>
 						<th><label class="block" for="announcement_end_date">End Date</label></th>
 						<td>
-							<p class="description">The date the announcement should <strong>stop</strong> displaying.</p>
+							<p class="description">Date that the announcement should become inactive. <strong>Note that announcements with no start date or end date will not appear in any announcement feeds.</p>
 							<input type="text" id="announcement_end_date" name="announcement_end_date" class="datepicker" <?php echo ( ! empty( $start_date ) ) ? 'value="' . $start_date . '"' : ''; ?>>
+						</td>
+					</tr>
+					<tr>
+						<th><label class="block" for="announcement_url">URL</label></th>
+						<td>
+							<p class="description">Link to a relevant website pertaining to the announcement or the posting organization.</p>
+							<input type="url" id="announcement_url" name="announcement_url" <?php echo ( ! empty( $url ) ) ? 'value="' . $url . '"' : '';?>>
+						</td>
+					</tr>
+					<tr>
+						<th><label class="block" for="announcement_contact">Contact Person</label></th>
+						<td>
+							<input type="text" id="announcement_contact" name="announcement_contact" <?php echo ( ! empty( $contact ) ) ? 'value="' . $contact . '"' : ''; ?>>
+						</td>
+					</tr>
+					<tr>
+						<th><label class="block" for="announcement_phone">Phone</label></th>
+						<td>
+							<input type="phone" id="announcement_phone" name="announcement_phone" <?php echo ( ! empty( $phone ) ) ? 'value="' . $phone . '"' : ''; ?>>
+						</td>
+					</tr>
+					<tr>
+						<th><label class="block" for="announcement_email">Email</label></th>
+						<td>
+							<input type="email" id="announcement_email" name="announcement_email" <?php echo ( ! empty( $email ) ) ? 'value="' . $email . '"' : ''; ?>>
+						</td>
+					</tr>
+					<tr>
+						<th><label class="block" for="announcement_posted_by">Posted By</label></th>
+						<td>
+							<p class="description">Name of the person/organization posting the announcement.</p>
+							<input type="text" id="announcement_posted_by" name="announcement_posted_by" <?php echo ( ! empty( $posted_by ) ) ? 'value="' . $posted_by . '"' : ''; ?>>
 						</td>
 					</tr>
 				</tbody>
@@ -97,33 +132,54 @@ if ( ! class_exists( 'UCF_Announcements_PostType' ) ) {
 		public static function save_metabox( $post_id ) {
 			$post_type = get_post_type( $post_id );
 			// If this isn't a promo, return.
-			if ( 'ucf_promo' !== $post_type ) return;
-			if ( isset( $_POST['ucf_promo_header'] ) ) {
+			if ( 'announcement' !== $post_type ) return;
+			if ( isset( $_POST['announcement_start_date'] ) ) {
 				// Ensure field is valid.
-				$header = sanitize_text_field( $_POST['ucf_promo_header'] );
-				if ( $header ) {
-					update_post_meta( $post_id, 'ucf_promo_header', $header );
+				$start_date = sanitize_text_field( $_POST['announcement_start_date'] );
+				if ( $start_date ) {
+					update_post_meta( $post_id, 'announcement_start_date', $start_date );
 				}
 			}
-			if ( isset( $_POST['ucf_promo_copy'] ) ) {
+			if ( isset( $_POST['announcement_end_date'] ) ) {
 				// Ensure field is valid.
-				$copy = $_POST['ucf_promo_copy'];
-				if ( $copy ) {
-					update_post_meta( $post_id, 'ucf_promo_copy', $copy );
+				$end_date = $_POST['announcement_end_date'];
+				if ( $end_date ) {
+					update_post_meta( $post_id, 'announcement_end_date', $end_date );
 				}
 			}
-			if ( isset( $_POST['ucf_promo_link_text'] ) ) {
+			if ( isset( $_POST['announcement_url'] ) ) {
 				// Ensure field is valid.
-				$link_text = sanitize_text_field( $_POST['ucf_promo_link_text'] );
-				if ( $link_text ) {
-					update_post_meta( $post_id, 'ucf_promo_link_text', $link_text );
+				$url = sanitize_text_field( $_POST['announcement_url'] );
+				if ( $url ) {
+					update_post_meta( $post_id, 'announcement_url', $url );
 				}
 			}
-			if ( isset( $_POST['ucf_promo_link_url'] ) ) {
+			if ( isset( $_POST['announcement_contact'] ) ) {
 				// Ensure field is valid.
-				$link_url = sanitize_text_field( $_POST['ucf_promo_link_url'] );
-				if ( $link_url ) {
-					update_post_meta( $post_id, 'ucf_promo_link_url', $link_url );
+				$contact = sanitize_text_field( $_POST['announcement_contact'] );
+				if ( $contact ) {
+					update_post_meta( $post_id, 'announcement_contact', $contact );
+				}
+			}
+			if ( isset( $_POST['announcement_phone'] ) ) {
+				// Ensure field is valid.
+				$phone = sanitize_text_field( $_POST['announcement_phone'] );
+				if ( $phone ) {
+					update_post_meta( $post_id, 'announcement_phone', $phone );
+				}
+			}
+			if ( isset( $_POST['announcement_email'] ) ) {
+				// Ensure field is valid.
+				$email = sanitize_text_field( $_POST['announcement_email'] );
+				if ( $email ) {
+					update_post_meta( $post_id, 'announcement_email', $email );
+				}
+			}
+			if ( isset( $_POST['announcement_posted_by'] ) ) {
+				// Ensure field is valid.
+				$posted_by = sanitize_text_field( $_POST['announcement_posted_by'] );
+				if ( $posted_by ) {
+					update_post_meta( $post_id, 'announcement_posted_by', $posted_by );
 				}
 			}
 		}

@@ -199,10 +199,10 @@ if ( !class_exists( 'UCF_Announcements_Config' ) ) {
 					ob_start();
 				?>
 					<select id="<?php echo $option_name; ?>" name="<?php echo $option_name; ?>">
-					<?php foreach( $choices as $key => $value ) : ?>
-						<?php if ( isset( $args['placeholder'] ) ) : ?>
+					<?php if ( isset( $args['placeholder'] ) ) : ?>
 						<option value="" disabled<?php echo $current_value ? '' : ' selected'; ?>><?php echo $args['placeholder']; ?></option>
-						<?php endif; ?>
+					<?php endif; ?>
+					<?php foreach( $choices as $key => $value ) : ?>
 						<option value="<?php echo $key; ?>"<?php echo ($key === $current_value) ? ' selected' : ''; ?>><?php echo $value; ?></option>
 					<?php endforeach; ?>
 					</select>
