@@ -76,7 +76,7 @@ if ( ! class_exists( 'UCF_Announcements_PostType' ) ) {
 						<th><label class="block" for="announcement_end_date">End Date</label></th>
 						<td>
 							<p class="description">Date that the announcement should become inactive. <strong>Note that announcements with no start date or end date will not appear in any announcement feeds.</p>
-							<input type="text" id="announcement_end_date" name="announcement_end_date" class="datepicker" <?php echo ( ! empty( $start_date ) ) ? 'value="' . $start_date . '"' : ''; ?>>
+							<input type="text" id="announcement_end_date" name="announcement_end_date" class="datepicker" <?php echo ( ! empty( $end_date ) ) ? 'value="' . $end_date . '"' : ''; ?>>
 						</td>
 					</tr>
 					<tr>
