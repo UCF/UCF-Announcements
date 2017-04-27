@@ -83,7 +83,7 @@ if ( ! class_exists( 'UCF_Announcements_Common' ) ) {
 		 **/
 		public static function announcement_save( $post_data, $form, $entry ) {
 			$form_id = UCF_Announcements_Config::get_option_or_default( 'form' );
-			if ( intval( $form['id'] ) === $form_id ) {
+			if ( $form['id'] == $form_id ) {
 				$post_data['post_type'] = 'announcement';
 			}
 
