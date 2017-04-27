@@ -73,7 +73,7 @@ if ( ! class_exists( 'UCF_Announcements_Common' ) ) {
 		}
 
 		/**
-		 * Handles changing the post type
+		 * Handles changing the post type and adding postmeta
 		 * @author Jim Barnes
 	     * @since 1.0.0
 		 * @param $post_data Array | An array of post data from the form.
@@ -88,6 +88,69 @@ if ( ! class_exists( 'UCF_Announcements_Common' ) ) {
 			}
 
 			return $post_data;
+		}
+
+		public static function map_field_ids( $form ) {
+			$retval = array();
+
+			foreach( $form['fields'] as $key => $field ) {
+				$retval[$field->inputName] = $field->id;
+			}
+
+			return $retval;
+		}
+
+		public static function anouncement_post_tax_save( $entry, $form ) {
+			$form_id = UCF_Announcements_Config::get_option_or_default( 'form' );
+			if ( ! $form['id'] == $form_id ) {
+				return;
+			}
+
+			$post = get_post( $entry['post_id'] );
+			$field_ids = self::map_field_ids( $form );
+
+			if ( $post ) {
+				$keywords = $audience_roles = $entry_keywords = $entry_audience_roles = array();
+
+				foreach( $entry as $key => $val ) {
+					if ( substr( $key, 0, 1 ) == $field_ids['audience'] && ! empty( $val ) ) {
+						$entry_audience_roles[] = $val;
+					} else  if ( $key == $field_ids['keywords'] ) {
+						$entry_keywords = explode( ',', $val );
+					}
+				}
+
+				if ( ! empty( $entry_audience_roles ) ) {
+					foreach( $entry_audience_roles as $role ) {
+						$role_term = get_term_by( 'name', $role, 'audienceroles', 'ARRAY_A' );
+						if ( is_array( $role_term ) ) {
+							$audience_roles[] = intval( $role_term['term_id'] );
+						}
+					}
+				}
+
+				if ( ! empty( $entry_keywords ) ) {
+					foreach( $entry_keywords as $keyword ) {
+						$keyword_term = get_term_by( 'name', $keyword, 'keywords', 'ARRAY_A' );
+
+						if ( ! $keyword_term ) {
+							$keyword_term = wp_insert_term( $keyword, 'keywords' );
+						}
+
+						if ( is_array( $keyword_term ) ) {
+							$keywords[] = intval( $keyword_term['term_id'] );
+						}
+					}
+				}
+
+				if ( ! empty( $audience_roles ) ) {
+					wp_set_object_terms( $post->ID, $audience_roles, 'audienceroles' );
+				}
+
+				if ( ! empty( $keywords ) ) {
+					wp_set_object_terms( $post->ID, $keywords, 'keywords' );
+				}
+			}
 		}
 	}
 }

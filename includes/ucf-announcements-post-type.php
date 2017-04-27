@@ -223,7 +223,11 @@ if ( ! class_exists( 'UCF_Announcements_PostType' ) ) {
 			);
 		}
 
-		public static function args() {
+		public static function args( $labels ) {
+			$singular = $labels['singular'];
+			$plural = $labels['plural'];
+			$post_type = $labels['post_type'];
+
 			$args = array(
 				'label'                 => __( 'Announcement', 'ucf_announcements' ),
 				'description'           => __( 'Announcements', 'ucf_announcements' ),
@@ -249,8 +253,7 @@ if ( ! class_exists( 'UCF_Announcements_PostType' ) ) {
 		}
 		public static function taxonomies() {
 			$retval = array(
-				'post_tag',
-				'category'
+				'audienceroles'
 			);
 
 			$retval = apply_filters( 'ucf_announcements_taxonomies', $retval );

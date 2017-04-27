@@ -24,6 +24,8 @@ include_once 'includes/ucf-announcements-auth.php';
 include_once 'includes/ucf-announcements-common.php';
 include_once 'includes/ucf-announcements-forms.php';
 include_once 'includes/ucf-announcements-post-type.php';
+include_once 'includes/ucf-announcements-audiences.php';
+include_once 'includes/ucf-announcements-keywords.php';
 
 if ( ! function_exists( 'ucf_announcements_plugin_activate' ) ) {
 	function ucf_announcements_plugin_activate() {
@@ -53,6 +55,11 @@ if ( ! function_exists( 'ucf_announcements_init' ) ) {
 		add_action( 'gform_post_data', array( 'UCF_Announcements_Common', 'announcement_save' ), 10, 3 );
 		// Register Custom post type
 		add_action( 'init', array( 'UCF_Announcements_PostType', 'register' ), 10, 0 );
+		add_action( 'init', array( 'UCF_Audience_Custom_Taxonomy', 'register_taxonomy' ), 10, 0 );
+		add_action( 'init', array( 'UCF_Keyword_Custom_Taxonomy', 'register_taxonomy' ), 10, 0 );
+
+		// Post form save
+		add_action( 'gform_after_submission', array( 'UCF_Announcements_Common', 'anouncement_post_tax_save' ), 10, 2 );
 	}
 
 	add_action( 'plugins_loaded', 'ucf_announcements_init' );
