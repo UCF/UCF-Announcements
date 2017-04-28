@@ -17,7 +17,6 @@ if ( ! class_exists( 'UCF_Announcements' ) ) {
 				$args,
 				array(
 					'limit'    => -1,
-					'keywords' => null,
 					'role'     => 'all',
 					'time'     => 'thisweek'
 				)
@@ -37,15 +36,6 @@ if ( ! class_exists( 'UCF_Announcements' ) ) {
 
 			if ( $role_args = self::get_role_arguments( $args['role'] ) ) {
 				$query_args = array_merge( $query_args, $role_args );
-			}
-
-			if ( $keyword_args = self::get_keyword_arguments( $args['keywords'] ) ) {
-				if ( isset( $query_args['tax_query'] ) ) {
-					$query_args['tax_query'][] = $keyword_args['tax_query'][0];
-					$query_args['s'] = $keyword_args['s'];
-				} else {
-					$query_args = array_merge( $query_args, $keyword_args );
-				}
 			}
 
 			$time_args = self::get_time_arguments( $args['time'] );
@@ -135,30 +125,6 @@ if ( ! class_exists( 'UCF_Announcements' ) ) {
 						'terms'    => $role
 					)
 				)
-			);
-		}
-
-		/**
-		 * Returns an array of arguments for WP_Query
-		 * @author Jim Barnes
-		 * @since 1.0.0
-		 * @param $keywords string | The keywords
-		 * @return Array | An array of arguments for WP_Query
-		 **/
-		private static function get_keyword_arguments( $keywords ) {
-			if ( ! $keywords ) {
-				return null;
-			}
-
-			return array(
-				'tax_query' => array(
-					array(
-						'taxonomy' => 'keywords',
-						'field'    => 'name',
-						'terms'    => $keywords
-					)
-				),
-				's' => $keywords
 			);
 		}
 
