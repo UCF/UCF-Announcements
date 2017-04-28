@@ -90,6 +90,13 @@ if ( ! class_exists( 'UCF_Announcements_Common' ) ) {
 			return $post_data;
 		}
 
+		/**
+		 * Maps gravity form inputName to ids
+		 * @author Jim Barnes
+		 * @since 1.0.0
+		 * @param $form Form | A gravity form object.
+		 * @return Form
+		 **/
 		public static function map_field_ids( $form ) {
 			$retval = array();
 
@@ -100,6 +107,14 @@ if ( ! class_exists( 'UCF_Announcements_Common' ) ) {
 			return $retval;
 		}
 
+		/**
+		 * Handles setting an announcements metadata after the gravity form
+		 * is submitted.
+		 * @author Jim Barnes
+		 * @since 1.0.0
+		 * @param $entry Entry | The gravity form entry
+		 * @param $form Form | The form that was submitted.
+		 **/
 		public static function anouncement_post_tax_save( $entry, $form ) {
 			$form_id = UCF_Announcements_Config::get_option_or_default( 'form' );
 			if ( ! $form['id'] == $form_id ) {
@@ -151,6 +166,19 @@ if ( ! class_exists( 'UCF_Announcements_Common' ) ) {
 					wp_set_object_terms( $post->ID, $keywords, 'keywords' );
 				}
 			}
+		}
+
+		/**
+		 * Tells WordPress not to texturize the output of
+		 * the announcements shortcode.
+		 * @author Jim Barnes
+		 * @since 1.0.0
+		 * @param $shortcode Array<string> | An array of shortcodes
+		 * @return Array<string> | The modified array of shortcodes
+		 **/
+		public static function no_texturize_me( $shortcodes ) {
+			$shortcodes[] = 'announcements';
+			return $shortcodes;
 		}
 	}
 }

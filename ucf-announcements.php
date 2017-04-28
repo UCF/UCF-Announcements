@@ -26,6 +26,7 @@ include_once 'includes/ucf-announcements-forms.php';
 include_once 'includes/ucf-announcements-post-type.php';
 include_once 'includes/ucf-announcements-audiences.php';
 include_once 'includes/ucf-announcements-keywords.php';
+include_once 'includes/ucf-announcements-shortcode.php';
 
 include_once 'includes/class-ucf-announcements.php';
 
@@ -57,7 +58,10 @@ if ( ! function_exists( 'ucf_announcements_init' ) ) {
 		add_action( 'gform_post_data', array( 'UCF_Announcements_Common', 'announcement_save' ), 10, 3 );
 		// Post form save
 		add_action( 'gform_after_submission', array( 'UCF_Announcements_Common', 'anouncement_post_tax_save' ), 10, 2 );
-		
+		// Add shortcode
+		add_action( 'init', array( 'UCF_Announcements_Shortcode', 'register_shortcode' ), 10, 0 );
+		add_filter( 'no_texturize_shortcodes', array( 'UCF_Announcements_Common', 'no_texturize_me' ), 10, 1 );
+
 		// Register Custom post type
 		add_action( 'init', array( 'UCF_Announcements_PostType', 'register' ), 10, 0 );
 		add_action( 'init', array( 'UCF_Audience_Custom_Taxonomy', 'register_taxonomy' ), 10, 0 );

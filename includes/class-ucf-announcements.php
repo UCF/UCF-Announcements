@@ -4,6 +4,14 @@
  **/
 if ( ! class_exists( 'UCF_Announcements' ) ) {
 	class UCF_Announcements {
+		/**
+		 * Retrieves announcements. Should be used instead of get_posts
+		 * or WP_Query
+		 * @author Jim Barnes
+		 * @since 1.0.0
+		 * @param $args Array | An array of arguments
+		 * @return Array<WP_Post> | An array of posts.
+		 **/
 		public static function get_announcements( $args ) {
 			$args = wp_parse_args(
 				$args,
@@ -14,8 +22,6 @@ if ( ! class_exists( 'UCF_Announcements' ) ) {
 					'time'     => 'thisweek'
 				)
 			);
-
-			var_dump( $args );
 
 			// Time variables
 			$this_monday = date( 'Y-m-d', strtotime( 'monday this week' ) );
@@ -48,7 +54,65 @@ if ( ! class_exists( 'UCF_Announcements' ) ) {
 
 			$retval = get_posts( $query_args );
 
+			foreach( $retval as $i => $post ) {
+				$post = self::append_post_meta( $post );
+			}
+
 			return $retval;
+		}
+
+		/**
+		 * Appends post meta to all posts passed in
+		 * @author Jim Barnes
+		 * @since 1.0.0
+		 * @param $post WP_Post | The post object
+		 * @return WP_Post | The modified post object.
+		 **/ 
+		public static function append_post_meta( $post ) {
+			$metas = get_post_meta( $post->ID );
+
+			$post->meta = self::format_post_meta( $metas );
+
+			return $post;
+		}
+
+		/**
+		 * Formats meta values and dereferences single values
+		 * @author Jim Barnes
+		 * @since 1.0.0
+		 * @param $metas Array | The array of meta keys and values
+		 * @return Array | The modified array of meta keys and values
+		 **/
+		private static function format_post_meta( $metas ) {
+			$retval = array();
+
+			foreach( $metas as $key => $value ) {
+				if ( count( $value ) === 1 ) {
+					$value = $value[0];
+				}
+
+				$retval[$key] = self::special_formatting( $key, $value );
+			}
+
+			return $retval;
+		}
+
+		/**
+		 * Handles any special formatting for fields.
+		 * @author Jim Barnes
+		 * @since 1.0.0
+		 * @param $key string | The meta key
+		 * @param $value mixed | The meta value
+		 * @return mixed | The formatted meta value.
+		 **/
+		private static function special_formatting( $key, $value ) {
+			switch( $key ) {
+				case 'announcement_start_date':
+				case 'announcement_end_date':
+					return new DateTime( $value );
+				default:
+					return $value;
+			}
 		}
 
 		/**
@@ -74,6 +138,13 @@ if ( ! class_exists( 'UCF_Announcements' ) ) {
 			);
 		}
 
+		/**
+		 * Returns an array of arguments for WP_Query
+		 * @author Jim Barnes
+		 * @since 1.0.0
+		 * @param $keywords string | The keywords
+		 * @return Array | An array of arguments for WP_Query
+		 **/
 		private static function get_keyword_arguments( $keywords ) {
 			if ( ! $keywords ) {
 				return null;

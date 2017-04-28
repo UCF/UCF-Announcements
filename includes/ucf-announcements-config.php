@@ -11,6 +11,21 @@ if ( !class_exists( 'UCF_Announcements_Config' ) ) {
 			$option_defaults = array();
 
 		/**
+		 * Returns the supported timeframes.
+		 * @author Jim Barnes
+		 * @since 1.0.0
+		 * @return Array | An array of timeframes.
+		 **/
+		public static function get_timeframes() {
+			return array(
+				'thisweek'  => 'This Week',
+				'nextweek'  => 'Next Week',
+				'thismonth' => 'This Month',
+				'nextmoth'  => 'Next Month'
+			);
+		}
+
+		/**
 		 * Creates options via the WP Options API that are utilized by the
 		 * plugin.  Intended to be run on plugin activation.
 		 *
