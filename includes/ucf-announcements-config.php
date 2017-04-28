@@ -21,7 +21,7 @@ if ( !class_exists( 'UCF_Announcements_Config' ) ) {
 				'thisweek'  => 'This Week',
 				'nextweek'  => 'Next Week',
 				'thismonth' => 'This Month',
-				'nextmoth'  => 'Next Month'
+				'nextmonth' => 'Next Month'
 			);
 		}
 
